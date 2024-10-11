@@ -21,13 +21,18 @@ const Table: React.FC<TableProps> = ({ data, setData }) => {
         unitPrice: number;
         unitsInStock: number;
     }) => {
+        if (!selectedProduct) {
+            console.error("No product selected for editing");
+            return;
+        }
+
         console.log("Updated product", updatedProduct);
         try {
             const productWithId = {
                 ...updatedProduct,
-                id: selectedProduct?.id,
+                id: selectedProduct.id,
             };
-            const result = await editProduct(productWithId : Product);
+            const result = await editProduct(productWithId);
 
             setData((prevData) =>
                 prevData.map((product) =>
@@ -41,10 +46,14 @@ const Table: React.FC<TableProps> = ({ data, setData }) => {
         }
     };
 
-    const handleDelete = async (product: Product) => {
+    const handleDelete = async (product: Product | null) => {
+        if (!product) {
+            console.error("No product selected for deletion");
+            return;
+        }
         try {
-            await deleteProduct(product.id );
-            setData((prevData ) => prevData.filter((p) => p.id !== product.id));
+            await deleteProduct(product.id);
+            setData((prevData) => prevData.filter((p) => p.id !== product.id));
             setConfirmDelete(false);
         } catch (error) {
             console.error("Error deleting product:", error);
@@ -146,7 +155,7 @@ const Table: React.FC<TableProps> = ({ data, setData }) => {
                                 Cancel
                             </button>
                             <button
-                                onClick={() => handleDelete(productToDelete!)}
+                                onClick={() => handleDelete(productToDelete)}
                                 className="bg-red-600 text-white rounded px-4 py-2"
                             >
                                 Delete
